@@ -6,6 +6,7 @@ Neuroimaging processing pipelines for PASSIAN, a [CODEC](https://ucl-codec.githu
 - For Preparing T1w (& T2w) MRI, e.g., for deep learning
   - [smriprep](https://github.com/ucl-codec/smriprep)
   - [mriqc](https://github.com/nipreps/mriqc)
+  - [ClinicaDL](https://github.com/aramis-lab/clinicaDL)
 
 ## Other BIDS Apps of potential interest
 
