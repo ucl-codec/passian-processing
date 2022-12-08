@@ -26,3 +26,4 @@ Note: It's possible to consider using a lighter touch for image preprocessing, e
 ### Other considerations
 - [MONAI](https://monai.io/), e.g., for [FL](https://github.com/Project-MONAI/tutorials/tree/main/federated_learning/openfl) using OpenFL
 - [ClinicaDL](https://github.com/aramis-lab/clinicaDL)
+- [TVB Pipeline](https://github.com/McIntosh-Lab/tvb-ukbb)
