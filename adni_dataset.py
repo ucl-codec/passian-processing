@@ -13,11 +13,16 @@ class ADNIDataset_bl(torch.utils.data.Dataset):
         labelss = pd.read_csv(self.labels_csv, low_memory=False)[['PTID', 'DX', 'VISCODE']]  # only ids, dx, visit
         labelss['FID'] = 'sub-' + labelss['PTID'].str.replace('_', '')  # add a new file ID columns
         labelss = labelss[labelss['VISCODE'] == 'bl']
-        self.labels = labelss[labelss['FID'].isin([file.split('/')[10] for file in self.image_files])]
+        self.labels = labelss[labelss['FID'].isin([file.split('/')[10] for file in self.image_files])]  # filter
         self.transforms = transforms
 
     def __getitem__(self, index):
-        return self.transforms(self.image_files[index]), self.labels[index]
+        ## Todo: test whether this works - maybe better to do ordered lists in __init__
+        image = self.transforms(self.image_files[index])
+        print('Image is ', self.image_files[index].split('/')[10])
+        label = self.labels['DX'][self.labels['FID'] == self.image_files[index].split('/')[10]].item()  # this should return image FID
+        print('Label is', label)
+        return image, self.labels[index]
 
     def __len__(self):
         return len(self.image_files)
