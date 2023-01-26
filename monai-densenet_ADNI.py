@@ -28,7 +28,9 @@ from monai.transforms import (
     ScaleIntensity,
 )
 from monai.utils import set_determinism
-from adni_dataset import ADNIDataset_bl  ## todo: test this
+from adni_dataset import ADNIDataset_bl
+from glob import glob
+import pandas as pd
 
 # print_config()
 
@@ -48,7 +50,7 @@ print(root_dir)
 data_dir = directory
 
 ## Set deterministic
-set_determinism(seed=0)
+set_determinism(seed=17)
 
 ## Read img filenames
 # class_names = sorted(x for x in os.listdir(data_dir)
@@ -86,10 +88,14 @@ set_determinism(seed=0)
 # plt.tight_layout()
 # plt.show()
 
+# Notes: This is the CAPS preprocd dir from aramis clinidaDL; can later change ses-bl to include more t-pts
+image_files_list = sorted(glob(os.path.join(data_dir, 'subjects/*/ses-bl/t1_linear/*Crop*.nii.gz')))
+
 ## Prep train, val, test
-val_frac = 0.1
+val_frac = 0.2
 test_frac = 0.1
-length = 36  # len(image_files_list)
+length = len(image_files_list)
+num_class = 3
 indices = np.arange(length)
 np.random.shuffle(indices)
 
@@ -99,12 +105,24 @@ test_indices = indices[:test_split]
 val_indices = indices[test_split:val_split]
 train_indices = indices[val_split:]
 
+labels_csv = "/home/imber/Projects/PASSIAN/data/ADNI/aramis_preproc/CAPS_smallsample/ADNIMERGE_2022-09-02.csv"
+labels_df = pd.read_csv(labels_csv, low_memory=False)[['PTID', 'DX', 'VISCODE']]  # only ids, dx, visit
+labels_df['FID'] = 'sub-' + labels_df['PTID'].str.replace('_', '')  # add a new file ID columns
+labels_df = labels_df[labels_df['VISCODE'] == 'bl']
+labels_df = labels_df[labels_df['FID'].isin([file.split('/')[10] for file in image_files_list])]  # filter
+labels_df = labels_df.sort_values('FID')  # this should work - test on larger sample!
+## todo: remap this to numbers (1, 2 , 3 ; check whether it works before converting to tensor
+classdict = {'CN': 1.0, 'MCI': 2.0, 'Dementia': 3.0}
+labels_df = labels_df.replace({'DX': classdict})
+labels = torch.tensor(list(labels_df['DX']))
+labels = labels.type(torch.LongTensor)
+
 train_x = [image_files_list[i] for i in train_indices]
-train_y = [image_class[i] for i in train_indices]
+train_y = [labels[i] for i in train_indices]
 val_x = [image_files_list[i] for i in val_indices]
-val_y = [image_class[i] for i in val_indices]
+val_y = [labels[i] for i in val_indices]
 test_x = [image_files_list[i] for i in test_indices]
-test_y = [image_class[i] for i in test_indices]
+test_y = [labels[i] for i in test_indices]
 
 print(
     f"Training count: {len(train_x)}, Validation count: "
@@ -129,35 +147,22 @@ y_pred_trans = Compose([Activations(softmax=True)])
 y_trans = Compose([AsDiscrete(to_onehot=num_class)])
 
 ## Define dataset and dataloader
-class MedNISTDataset(torch.utils.data.Dataset):
-    def __init__(self, image_files, labels, transforms):
-        self.image_files = image_files
-        self.labels = labels
-        self.transforms = transforms
-
-    def __len__(self):
-        return len(self.image_files)
-
-    def __getitem__(self, index):
-        return self.transforms(self.image_files[index]), self.labels[index]
-
-
-train_ds = MedNISTDataset(train_x, train_y, train_transforms)
+train_ds = ADNIDataset_bl(train_x, train_y, train_transforms)
 train_loader = DataLoader(
-    train_ds, batch_size=300, shuffle=True, num_workers=10)
+    train_ds, batch_size=3, shuffle=True, num_workers=10)
 
-val_ds = MedNISTDataset(val_x, val_y, val_transforms)
+val_ds = ADNIDataset_bl(val_x, val_y, val_transforms)
 val_loader = DataLoader(
-    val_ds, batch_size=300, num_workers=10)
+    val_ds, batch_size=3, num_workers=10)
 
-test_ds = MedNISTDataset(test_x, test_y, val_transforms)
+test_ds = ADNIDataset_bl(test_x, test_y, val_transforms)
 test_loader = DataLoader(
-    test_ds, batch_size=300, num_workers=10)
+    test_ds, batch_size=3, num_workers=10)
 
 ## Define network and optimiser
 # note, random transforms each epoch means different data each epoch
 device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
-model = DenseNet121(spatial_dims=2, in_channels=1,
+model = DenseNet121(spatial_dims=3, in_channels=1,
                     out_channels=num_class).to(device)
 loss_function = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), 1e-5)
@@ -248,26 +253,26 @@ plt.xlabel("epoch")
 plt.plot(x, y)
 plt.show()
 
-## Evaluate model on test dataset
-model.load_state_dict(torch.load(
-    os.path.join(root_dir, "best_metric_model.pth")))
-model.eval()
-y_true = []
-y_pred = []
-with torch.no_grad():
-    for test_data in test_loader:
-        test_images, test_labels = (
-            test_data[0].to(device),
-            test_data[1].to(device),
-        )
-        pred = model(test_images).argmax(dim=1)
-        for i in range(len(pred)):
-            y_true.append(test_labels[i].item())
-            y_pred.append(pred[i].item())
-
-## Print classification report
-print(classification_report(
-    y_true, y_pred, target_names=class_names, digits=4))
+# ## Evaluate model on test dataset
+# model.load_state_dict(torch.load(
+#     os.path.join(root_dir, "best_metric_model.pth")))
+# model.eval()
+# y_true = []
+# y_pred = []
+# with torch.no_grad():
+#     for test_data in test_loader:
+#         test_images, test_labels = (
+#             test_data[0].to(device),
+#             test_data[1].to(device),
+#         )
+#         pred = model(test_images).argmax(dim=1)
+#         for i in range(len(pred)):
+#             y_true.append(test_labels[i].item())
+#             y_pred.append(pred[i].item())
+#
+# ## Print classification report
+# print(classification_report(
+#     y_true, y_pred, target_names=class_names, digits=4))
 
 
 
