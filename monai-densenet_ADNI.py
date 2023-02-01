@@ -31,6 +31,8 @@ from monai.utils import set_determinism
 from adni_dataset import ADNIDataset_bl
 from glob import glob
 import pandas as pd
+from collections import Counter
+from datetime import datetime
 
 # print_config()
 
@@ -50,7 +52,7 @@ print(root_dir)
 data_dir = directory
 
 ## Set deterministic
-set_determinism(seed=17)
+set_determinism(seed=42)
 
 ## Read img filenames
 # class_names = sorted(x for x in os.listdir(data_dir)
@@ -111,22 +113,27 @@ labels_df['FID'] = 'sub-' + labels_df['PTID'].str.replace('_', '')  # add a new 
 labels_df = labels_df[labels_df['VISCODE'] == 'bl']
 labels_df = labels_df[labels_df['FID'].isin([file.split('/')[10] for file in image_files_list])]  # filter
 labels_df = labels_df.sort_values('FID')  # this should work - test on larger sample!
-## todo: remap this to numbers (1, 2 , 3 ; check whether it works before converting to tensor
-classdict = {'CN': 1.0, 'MCI': 2.0, 'Dementia': 3.0}
-labels_df = labels_df.replace({'DX': classdict})
-labels = torch.tensor(list(labels_df['DX']))
-labels = labels.type(torch.LongTensor)
+print('Class balance on entire dataset (train, validation, test):\n',  labels_df['DX'].value_counts())
+
+cn = ['CN', 'MCI', 'Dementia']  # class names
+cd = {cn[0]: 0.0, cn[1]: 1.0, cn[2]: 2.0}  # class dictionary  # note to self: always start at 0
+labels_df = labels_df.replace({'DX': cd})
+image_class = torch.tensor(list(labels_df['DX']))
+image_class = image_class.type(torch.LongTensor)
 
 train_x = [image_files_list[i] for i in train_indices]
-train_y = [labels[i] for i in train_indices]
+train_y = [image_class[i] for i in train_indices]
 val_x = [image_files_list[i] for i in val_indices]
-val_y = [labels[i] for i in val_indices]
+val_y = [image_class[i] for i in val_indices]
 test_x = [image_files_list[i] for i in test_indices]
-test_y = [labels[i] for i in test_indices]
+test_y = [image_class[i] for i in test_indices]
 
 print(
     f"Training count: {len(train_x)}, Validation count: "
     f"{len(val_x)}, Test count: {len(test_x)}")
+print('Class balance on training population:', torch.tensor(train_y).unique(return_counts=True, sorted=False))
+print('Class balance on validation population:', torch.tensor(val_y).unique(return_counts=True, sorted=False))
+print('Class balance on test population:', torch.tensor(test_y).unique(return_counts=True, sorted=False))
 
 ## Define train transforms (augmentations)
 train_transforms = Compose(
@@ -146,18 +153,20 @@ val_transforms = Compose(
 y_pred_trans = Compose([Activations(softmax=True)])
 y_trans = Compose([AsDiscrete(to_onehot=num_class)])
 
+bs = 10  # batch size
+
 ## Define dataset and dataloader
 train_ds = ADNIDataset_bl(train_x, train_y, train_transforms)
 train_loader = DataLoader(
-    train_ds, batch_size=3, shuffle=True, num_workers=10)
+    train_ds, batch_size=bs, shuffle=True, num_workers=10)
 
 val_ds = ADNIDataset_bl(val_x, val_y, val_transforms)
 val_loader = DataLoader(
-    val_ds, batch_size=3, num_workers=10)
+    val_ds, batch_size=bs, num_workers=10)
 
 test_ds = ADNIDataset_bl(test_x, test_y, val_transforms)
 test_loader = DataLoader(
-    test_ds, batch_size=3, num_workers=10)
+    test_ds, batch_size=bs, num_workers=10)
 
 ## Define network and optimiser
 # note, random transforms each epoch means different data each epoch
@@ -166,7 +175,7 @@ model = DenseNet121(spatial_dims=3, in_channels=1,
                     out_channels=num_class).to(device)
 loss_function = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), 1e-5)
-max_epochs = 4
+max_epochs = 5  # AUC 0.7741 after 100 epochs
 val_interval = 1
 auc_metric = ROCAUCMetric()
 
@@ -184,6 +193,7 @@ for epoch in range(max_epochs):
     step = 0
     for batch_data in train_loader:
         step += 1
+        # print(batch_data[0].size(), ' and label', batch_data[1].size())
         inputs, labels = batch_data[0].to(device), batch_data[1].to(device)
         optimizer.zero_grad()
         outputs = model(inputs)
@@ -223,8 +233,9 @@ for epoch in range(max_epochs):
             if result > best_metric:
                 best_metric = result
                 best_metric_epoch = epoch + 1
+                now = datetime.now().strftime("%d_%m_%Y_%H:%M")
                 torch.save(model.state_dict(), os.path.join(
-                    root_dir, "best_metric_model.pth"))
+                    root_dir, f"{now}_best_metric_model.pth"))
                 print("saved new best metric model")
             print(
                 f"current epoch: {epoch + 1} current AUC: {result:.4f}"
@@ -253,26 +264,26 @@ plt.xlabel("epoch")
 plt.plot(x, y)
 plt.show()
 
-# ## Evaluate model on test dataset
-# model.load_state_dict(torch.load(
-#     os.path.join(root_dir, "best_metric_model.pth")))
-# model.eval()
-# y_true = []
-# y_pred = []
-# with torch.no_grad():
-#     for test_data in test_loader:
-#         test_images, test_labels = (
-#             test_data[0].to(device),
-#             test_data[1].to(device),
-#         )
-#         pred = model(test_images).argmax(dim=1)
-#         for i in range(len(pred)):
-#             y_true.append(test_labels[i].item())
-#             y_pred.append(pred[i].item())
-#
-# ## Print classification report
-# print(classification_report(
-#     y_true, y_pred, target_names=class_names, digits=4))
+## Evaluate model on test dataset
+model.load_state_dict(torch.load(
+    os.path.join(root_dir, "best_metric_model.pth")))
+model.eval()
+y_true = []
+y_pred = []
+with torch.no_grad():
+    for test_data in test_loader:
+        test_images, test_labels = (
+            test_data[0].to(device),
+            test_data[1].to(device),
+        )
+        pred = model(test_images).argmax(dim=1)
+        for i in range(len(pred)):
+            y_true.append(test_labels[i].item())
+            y_pred.append(pred[i].item())
+
+## Print classification report
+print(classification_report(
+    y_true, y_pred, target_names=cn, digits=4))
 
 
 
