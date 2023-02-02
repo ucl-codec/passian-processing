@@ -131,9 +131,9 @@ test_y = [image_class[i] for i in test_indices]
 print(
     f"Training count: {len(train_x)}, Validation count: "
     f"{len(val_x)}, Test count: {len(test_x)}")
-print('Class balance on training population:', torch.tensor(train_y).unique(return_counts=True, sorted=False))
-print('Class balance on validation population:', torch.tensor(val_y).unique(return_counts=True, sorted=False))
-print('Class balance on test population:', torch.tensor(test_y).unique(return_counts=True, sorted=False))
+print('Class balance on training population:', torch.tensor(train_y).unique(return_counts=True))
+print('Class balance on validation population:', torch.tensor(val_y).unique(return_counts=True))
+print('Class balance on test population:', torch.tensor(test_y).unique(return_counts=True))
 
 ## Define train transforms (augmentations)
 train_transforms = Compose(
@@ -175,7 +175,7 @@ model = DenseNet121(spatial_dims=3, in_channels=1,
                     out_channels=num_class).to(device)
 loss_function = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), 1e-5)
-max_epochs = 5  # AUC 0.7741 after 100 epochs
+max_epochs = 2  # AUC 0.7741 after 100 epochs
 val_interval = 1
 auc_metric = ROCAUCMetric()
 
@@ -276,6 +276,7 @@ with torch.no_grad():
             test_data[0].to(device),
             test_data[1].to(device),
         )
+        assert isinstance(model(test_images).argmax, object)
         pred = model(test_images).argmax(dim=1)
         for i in range(len(pred)):
             y_true.append(test_labels[i].item())

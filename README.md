@@ -11,6 +11,7 @@ Note: It's possible to consider using a lighter touch for image preprocessing, e
     - [BrainQCNet](https://github.com/garciaml/BrainQCNet) ([paper](https://www.biorxiv.org/content/10.1101/2022.03.11.483983v1.full); GPU version: [BrainQCNet_GPU](https://github.com/garciaml/BrainQCNet_GPU))
   - [smriprep](https://github.com/ucl-codec/smriprep)
   - [TorchIO](https://torchio.readthedocs.io/transforms/preprocessing.html)
+  - [MRtrix3](https://mrtrix.readthedocs.io/en/latest/) - skull stripping, etc.
 
 
 ## Other BIDS Apps of potential interest
