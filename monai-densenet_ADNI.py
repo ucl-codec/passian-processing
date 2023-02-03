@@ -41,54 +41,11 @@ directory = '/home/imber/Projects/PASSIAN/data/ADNI/aramis_preproc/CAPS_smallsam
 root_dir = tempfile.mkdtemp() if directory is None else directory
 print(root_dir)
 
-## DL dataset
-# resource = "https://github.com/Project-MONAI/MONAI-extra-test-data/releases/download/0.8.1/MedNIST.tar.gz"
-# md5 = "0bc7306e7427e00ad1c5526a6677552d"
-#
-# compressed_file = os.path.join(root_dir, "MedNIST.tar.gz")
-# data_dir = os.path.join(root_dir, "MedNIST")
-# if not os.path.exists(data_dir):
-#     download_and_extract(resource, compressed_file, root_dir, md5)
 data_dir = directory
 
 ## Set deterministic
 set_determinism(seed=42)
 
-## Read img filenames
-# class_names = sorted(x for x in os.listdir(data_dir)
-#                      if os.path.isdir(os.path.join(data_dir, x)))
-# num_class = len(class_names)
-# image_files = [
-#     [
-#         os.path.join(data_dir, class_names[i], x)
-#         for x in os.listdir(os.path.join(data_dir, class_names[i]))
-#     ]
-#     for i in range(num_class)
-# ]
-# num_each = [len(image_files[i]) for i in range(num_class)]
-# image_files_list = []
-# image_class = []
-# for i in range(num_class):
-#     image_files_list.extend(image_files[i])
-#     image_class.extend([i] * num_each[i])
-# num_total = len(image_class)
-# image_width, image_height = PIL.Image.open(image_files_list[0]).size
-#
-# print(f"Total image count: {num_total}")
-# print(f"Image dimensions: {image_width} x {image_height}")
-# print(f"Label names: {class_names}")
-# print(f"Label counts: {num_each}")
-
-## Visualize
-# plt.subplots(3, 3, figsize=(8, 8))
-# for i, k in enumerate(np.random.randint(num_total, size=9)):
-#     im = PIL.Image.open(image_files_list[k])
-#     arr = np.array(im)
-#     plt.subplot(3, 3, i + 1)
-#     plt.xlabel(class_names[image_class[k]])
-#     plt.imshow(arr, cmap="gray", vmin=0, vmax=255)
-# plt.tight_layout()
-# plt.show()
 
 # Notes: This is the CAPS preprocd dir from aramis clinidaDL; can later change ses-bl to include more t-pts
 image_files_list = sorted(glob(os.path.join(data_dir, 'subjects/*/ses-bl/t1_linear/*Crop*.nii.gz')))
