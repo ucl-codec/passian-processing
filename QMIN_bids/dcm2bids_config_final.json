@@ -1,0 +1,650 @@
+{
+    "dcm2niixOptions": "-z y -f %p_%t_%s -ba n -i y",
+    "descriptions": [
+      {
+	"dataType": "anat",
+	"modalityLabel": "T2w",
+	"criteria": {
+		"SeriesDescription": "*t2_haste_tra*"
+	}
+      },	
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "corMPR MPRAGE"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "Axial MPR MPRAGE"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "t1_mprage_sag_p2*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "MPR_Tra_1mmMPRAGE"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "AX T1 MPR 1.0mm"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "Cor T1 MPR 1.0mm"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "MPR AX*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*COR MPR*"
+	}
+      },
+      {
+	"dataType": "anat",	
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "MPR 1mm Ax"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "MPR Cor 1mm"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "REP_AX*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "REP_MPR_COR"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*MPR_Ax_MIP_T1*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*MPR_AX_1.0MM_T1*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*MPR_Axial T1*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*REP_MPR_ax_1mm*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*MPR_1.0MM_T1_MPRAG*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*CMORE_t1_mprage*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*<MPR Range[1]>*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*AX MPR*"
+ 	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*MPR AX 1mm*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*MPR COR 1mm*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*MPR_Cor_1mm*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*MPR_Ax_1mm*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*MPR 1.0mm Coronal T1*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"crtieria": {
+		"SeriesDescription": "*MPR_Axial_t1_1.0mm*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*mpr cor*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*MPR Cor T1*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*MPR COR 1mm*"
+	}     
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*Cor MPR*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*MPR_AX_1mm*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*Ax MPR*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*COR MPRAGE MPR*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*MPR_1mm_AX*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*MPR_1mm_COR*"
+	}	
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*MRP_COR_1mm*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*AXIAL_T1*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*Axial_T1*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*axial_T1*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*Axial_1mm*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*AXIAL_1mm*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*axial_1mm*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*MR T1 Axial*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*MPR_Cor_T1*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*REP_MPR_Cor_1mm*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*MPR_REP_COR_1mm*"
+	} 
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*t1_tse*"
+	} 
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*T1 Cor*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*MPRAGE_iPAT*"
+	}      
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*MPRAGE_MPR*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*MPR_Ax_T1*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*MPR_AX_T1*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*MPR Ax*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*Axial T1_1mm_MPR*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*Coronal T1_1mm_MPR*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*MPR_COR_T1*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*MRP_T1*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*ax mpr*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*cor mpr*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*MPR COR*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*MPR_COR_1mm*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*MPR_TRA_1mm*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T1w",
+	"criteria": {
+		"SeriesDescription": "*MPR_T1*" 
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T2w",
+	"criteria": {
+		"SeriesDescription": "Axial T2 space MPR"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T2w",
+	"criteria": {
+		"SeriesDescription": "Cor T2 space MPR"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "FLAIR",
+	"criteria": {
+		"SeriesDescription": "*CMORE_t2_space*"
+	}       
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T2w",
+	"criteria": {
+		"SeriesDescription": "t2_spc_sag_p2_iso*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "FLAIR",
+	"criteria": {
+		"SeriesDescription": "t2_space_dark*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T2w",
+	"criteria": {
+		"SeriesDescription": "*t2_tse*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T2w",
+	"criteria": {
+		"SeriesDescription": "*t2_fl2d*"
+	} 
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T2w",
+	"criteria": {
+		"SeriesDescription": "*t2_spc_ns*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T2w",
+	"criteria": {
+		"SeriesDescription": "*t2_me2d*"
+	}
+      },
+      { 
+	"dataType": "anat",
+	"modalityLabel": "T2w",
+	"criteria": {
+		"SeriesDescription": "*coronal t2*"
+	}
+      },
+      {
+ 	"dataType": "anat",
+	"modalityLabel": "T2w",
+	"criteria": {
+		"SeriesDescription": "*T2_SPC_MPR*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T2w",
+	"criteria": {
+		"SeriesDescription": "*T2_spc_MPR*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T2w",
+	"criteria": {
+		"SeriesDescription": "*T2_spc_ MPR*"
+	}
+      },
+      { 
+	"dataType": "anat",
+	"modalityLabel": "T2w",
+	"criteria": {
+		"SeriesDescription": "*Space MPR Cor*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T2w",
+	"criteria": {
+		"SeriesDescription": "T",
+		"SidecarFilename": "*t2_spc_ns_sag_p2_iso*"
+	}	
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T2w",
+	"criteria": {
+		"SeriesDescription": "*<MPR Range>*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "FLAIR",
+	"criteria": {
+		"SeriesDescription": "*t2_tirm*"
+	}
+      },
+      { 
+	"dataType": "anat",
+	"modalityLabel": "T2w",
+	"criteria": {
+		"SeriesDescription": "*MPR_Ax_Spc_1.2*"
+	}
+      },
+      {
+	"dataType": "anat",
+	"modalityLabel": "T2w",
+	"criteria": {
+		"SeriesDescription": "*MPR_Cor_SPC_1.2*"
+	}
+      },
+      {
+	"dataType": "swi",
+	"modalityLabel": "T2starw", 
+	"criteria": {
+		"SeriesDescription": "*BioBank_SWI*"
+	}
+      },
+      {
+	"dataType": "dwi",
+	"modalityLabel": "dwi",
+	"criteria": {
+		"SeriesDescription": "*ep2d_diff*"
+	}
+      },
+      {
+	"dataType": "func",
+	"modalityLabel": "bold",
+	"customLabels": "task-rest",
+	"criteria": {
+		"SeriesDescription": "*MB8_FMRI*"
+	}
+      },
+      {
+	"dataType": "func",
+	"modalityLabel": "bold",
+	"customLabels": "task-rest",
+	"criteria": {
+		"SeriesDescription": "*ep2d_bold*"
+	}
+      },
+      {
+	"dataType": "func",
+	"modalityLabel": "bold",
+	"customLabels": "task-rest",
+	"criteria": {
+		"SeriesDescription": "*MoCoSeries*"
+	}
+      },
+      {
+	"dataType": "func",
+	"modalityLabel": "bold",
+	"customLabels": "bold",
+	"customLabels": "task-rest",
+	"criteria": {
+		"SeriesDescription": "*bold_mbep2d*"
+	}
+      },
+      {
+	"dataType": "dti",
+	"modalityLabel": "dwi",
+	"customLabels": "dir-AP",
+	"criteria": {
+		"SeriesDescription": "CBU_mbep2d_1.75mm_AP*"
+	}
+      },
+      {
+	"dataType": "dti",
+	"modalityLabel": "dwi",
+	"customLabels": "dir-PA",
+	"criteria": {
+		"SeriesDescription": "CBU_mbep2d_1.75mm_PA*"
+	}
+      }
+    ]
+}
