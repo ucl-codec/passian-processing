@@ -2,7 +2,7 @@
 https://gitlab.inria.fr/fedbiomed/fedbiomed/-/blob/develop/notebooks/monai-2d-image-classification-gpu.ipynb
 https://github.com/Project-MONAI/tutorials/blob/main/2d_classification/mednist_tutorial.ipynb'''
 
-import os
+import os, sys
 import shutil
 import tempfile
 import matplotlib.pyplot as plt
@@ -37,18 +37,39 @@ from datetime import datetime
 # print_config()
 
 ## Setup data dir
-directory = '/home/imber/Projects/PASSIAN/data/ADNI/aramis_preproc/CAPS_smallsample'  # os.environ.get("MONAI_DATA_DIRECTORY")
+directory = '/home/imber/Projects/PASSIAN/data/ADNI/aramis_preproc/CAPS_ADNI_bl'  # the full adni baseline dataset
 root_dir = tempfile.mkdtemp() if directory is None else directory
 print(root_dir)
-
 data_dir = directory
 
 ## Set deterministic
 set_determinism(seed=42)
 
-
 # Notes: This is the CAPS preprocd dir from aramis clinidaDL; can later change ses-bl to include more t-pts
 image_files_list = sorted(glob(os.path.join(data_dir, 'subjects/*/ses-bl/t1_linear/*Crop*.nii.gz')))
+subjects = [file.split('/')[10] for file in image_files_list]
+
+# Filtering and sorting the labels from the clinical data csv
+labels_csv = "/home/imber/Projects/PASSIAN/data/ADNI/aramis_preproc/CAPS_smallsample/ADNIMERGE_2022-09-02.csv"
+labels_df = pd.read_csv(labels_csv, low_memory=False)[['PTID', 'DX', 'VISCODE']]  # only ids, dx, visit
+labels_df['FID'] = 'sub-' + labels_df['PTID'].str.replace('_', '')  # add a new file ID columns
+labels_df = labels_df[labels_df['VISCODE'] == 'bl']
+labels_df = labels_df[labels_df['FID'].isin(subjects)]  # filter
+labels_df = labels_df.dropna(subset=['DX'])  # get rid of NaNs in the labels
+labels_df = labels_df.sort_values('FID')  # this should work - test on larger sample!
+print('Class balance on entire dataset (train, validation, test):\n',  labels_df['DX'].value_counts())
+no_labels = [x for x in subjects if x not in labels_df['FID'].values] # these subjects are missing labels (delete from dataset)
+if no_labels:
+    print('The following subjects in the image_files_list are missing labels:\n', no_labels)
+    print('Aborting...')
+    sys.exit()
+
+cn = ['CN', 'MCI', 'Dementia']  # class names
+cd = {cn[0]: 0.0, cn[1]: 1.0, cn[2]: 2.0}  # class dictionary  # note to self: always start at 0
+labels_df = labels_df.replace({'DX': cd})
+image_class = torch.tensor(list(labels_df['DX']))
+image_class = image_class.type(torch.LongTensor)
+
 
 ## Prep train, val, test
 val_frac = 0.2
@@ -63,20 +84,6 @@ val_split = int(val_frac * length) + test_split
 test_indices = indices[:test_split]
 val_indices = indices[test_split:val_split]
 train_indices = indices[val_split:]
-
-labels_csv = "/home/imber/Projects/PASSIAN/data/ADNI/aramis_preproc/CAPS_smallsample/ADNIMERGE_2022-09-02.csv"
-labels_df = pd.read_csv(labels_csv, low_memory=False)[['PTID', 'DX', 'VISCODE']]  # only ids, dx, visit
-labels_df['FID'] = 'sub-' + labels_df['PTID'].str.replace('_', '')  # add a new file ID columns
-labels_df = labels_df[labels_df['VISCODE'] == 'bl']
-labels_df = labels_df[labels_df['FID'].isin([file.split('/')[10] for file in image_files_list])]  # filter
-labels_df = labels_df.sort_values('FID')  # this should work - test on larger sample!
-print('Class balance on entire dataset (train, validation, test):\n',  labels_df['DX'].value_counts())
-
-cn = ['CN', 'MCI', 'Dementia']  # class names
-cd = {cn[0]: 0.0, cn[1]: 1.0, cn[2]: 2.0}  # class dictionary  # note to self: always start at 0
-labels_df = labels_df.replace({'DX': cd})
-image_class = torch.tensor(list(labels_df['DX']))
-image_class = image_class.type(torch.LongTensor)
 
 train_x = [image_files_list[i] for i in train_indices]
 train_y = [image_class[i] for i in train_indices]
@@ -110,7 +117,7 @@ val_transforms = Compose(
 y_pred_trans = Compose([Activations(softmax=True)])
 y_trans = Compose([AsDiscrete(to_onehot=num_class)])
 
-bs = 10  # batch size
+bs = 8  # batch size
 
 ## Define dataset and dataloader
 train_ds = ADNIDataset_bl(train_x, train_y, train_transforms)
@@ -127,12 +134,12 @@ test_loader = DataLoader(
 
 ## Define network and optimiser
 # note, random transforms each epoch means different data each epoch
-device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
+device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 model = DenseNet121(spatial_dims=3, in_channels=1,
                     out_channels=num_class).to(device)
 loss_function = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), 1e-5)
-max_epochs = 2  # AUC 0.7741 after 100 epochs
+max_epochs = 10  # AUC 0.7741 after 100 epochs
 val_interval = 1
 auc_metric = ROCAUCMetric()
 
@@ -191,8 +198,9 @@ for epoch in range(max_epochs):
                 best_metric = result
                 best_metric_epoch = epoch + 1
                 now = datetime.now().strftime("%d_%m_%Y_%H:%M")
+                best_model_name = f"{now}_best_metric_model.pth"
                 torch.save(model.state_dict(), os.path.join(
-                    root_dir, f"{now}_best_metric_model.pth"))
+                    root_dir, best_model_name))
                 print("saved new best metric model")
             print(
                 f"current epoch: {epoch + 1} current AUC: {result:.4f}"
@@ -223,7 +231,7 @@ plt.show()
 
 ## Evaluate model on test dataset
 model.load_state_dict(torch.load(
-    os.path.join(root_dir, "best_metric_model.pth")))
+    os.path.join(root_dir, best_model_name)))
 model.eval()
 y_true = []
 y_pred = []
