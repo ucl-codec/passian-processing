@@ -43,7 +43,7 @@ print(root_dir)
 labels_csv = "/home/imber/Projects/PASSIAN/data/ADNI/aramis_preproc/CAPS_smallsample/ADNIMERGE_2022-09-02.csv"
 
 ## Set deterministic
-set_determinism(seed=42)
+set_determinism(seed=37)
 
 image_files_list, image_class, cn = load_adni(root_dir, labels_csv)
 
@@ -54,8 +54,8 @@ length = len(image_files_list)
 num_class = 3
 indices = np.arange(length)
 np.random.shuffle(indices)
-bs = 5  # batch size
-max_epochs = 2  # AUC 0.7741 after 100 epochs
+bs = 10  # batch size
+max_epochs = 1  # AUC 0.7741 after 100 epochs
 
 test_split = int(test_frac * length)
 val_split = int(val_frac * length) + test_split
@@ -227,6 +227,9 @@ with torch.no_grad():
 ## Print classification report
 print(classification_report(
     y_true, y_pred, target_names=cn, digits=4))
+
+with open(os.path.join(root_dir, f'{datetime.now().strftime("%d_%m_%Y_%H:%M")}_classification_report.txt'), 'w') as f:
+    f.write(classification_report(y_true, y_pred, target_names=cn, digits=4))
 
 
 
