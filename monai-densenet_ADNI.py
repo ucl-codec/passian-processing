@@ -15,7 +15,7 @@ from monai.apps import download_and_extract
 from monai.config import print_config
 from monai.data import decollate_batch, DataLoader
 from monai.metrics import ROCAUCMetric
-from monai.networks.nets import DenseNet121
+from monai.networks.nets import DenseNet121, EfficientNetBN
 from monai.transforms import (
     Activations,
     EnsureChannelFirst,
@@ -34,6 +34,7 @@ import pandas as pd
 from collections import Counter
 from datetime import datetime
 from helper_functions import load_adni
+from RAN_model import ResidualAttentionNetwork
 
 # print_config()
 
@@ -54,8 +55,8 @@ length = len(image_files_list)
 num_class = 3
 indices = np.arange(length)
 np.random.shuffle(indices)
-bs = 10  # batch size
-max_epochs = 1  # AUC 0.7741 after 100 epochs
+bs = 3  # batch size
+max_epochs = 300  # AUC 0.7741 after 100 epochs
 
 test_split = int(test_frac * length)
 val_split = int(val_frac * length) + test_split
@@ -112,8 +113,10 @@ test_loader = DataLoader(
 ## Define network and optimiser
 # note, random transforms each epoch means different data each epoch
 device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
-model = DenseNet121(spatial_dims=3, in_channels=1,
-                    out_channels=num_class).to(device)
+# model = DenseNet121(spatial_dims=3, in_channels=1,
+#                     out_channels=num_class).to(device)
+# model = ResidualAttentionNetwork(in_channels=12, num_classes=num_class).to(device)
+model = EfficientNetBN(model_name="efficientnet-b8",pretrained=False,spatial_dims=3,in_channels=1,num_classes=3).to(device)
 loss_function = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), 1e-5)
 val_interval = 1
@@ -173,8 +176,9 @@ for epoch in range(max_epochs):
             if result > best_metric:
                 best_metric = result
                 best_metric_epoch = epoch + 1
-                now = datetime.now().strftime("%d_%m_%Y_%H:%M")
-                best_model_name = f"{now}_best_metric_model.pth"
+                now = datetime.now().strftime("%d-%m-%Y_%H:%M")
+                mname = model.__class__.__name__
+                best_model_name = f"{now}_{mname}_best_model.pth"
                 # Todo: this currently saves every best model, implement deleting to save disc space
                 torch.save(model.state_dict(), os.path.join(
                     root_dir, best_model_name))
@@ -207,6 +211,7 @@ plt.plot(x, y)
 plt.show()
 
 ## Evaluate model on test dataset
+print("Evaluating model on test set...")
 model.load_state_dict(torch.load(
     os.path.join(root_dir, best_model_name)))
 model.eval()
@@ -225,6 +230,7 @@ with torch.no_grad():
             y_pred.append(pred[i].item())
 
 ## Print classification report
+print("Generating classification report...")
 print(classification_report(
     y_true, y_pred, target_names=cn, digits=4))
 
