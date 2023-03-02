@@ -35,7 +35,7 @@ from glob import glob
 import pandas as pd
 from collections import Counter
 from datetime import datetime
-from helper_functions_QMIN import load_qmin
+from helper_functions import load_qmin
 
 # print_config()
 
