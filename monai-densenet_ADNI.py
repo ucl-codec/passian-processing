@@ -1,5 +1,6 @@
 ''' This is from this Fed-BioMed tutorial, but locally, without FL
 https://gitlab.inria.fr/fedbiomed/fedbiomed/-/blob/develop/notebooks/monai-2d-image-classification-gpu.ipynb
+https://github.com/Project-MONAI/tutorials/blob/main/2d_classification/mednist_tutorial.ipynb
 https://github.com/Project-MONAI/tutorials/blob/main/2d_classification/mednist_tutorial.ipynb'''
 
 import os, sys
@@ -11,7 +12,6 @@ import torch
 import numpy as np
 from sklearn.metrics import classification_report
 
-from monai.apps import download_and_extract
 from monai.config import print_config
 from monai.data import decollate_batch, DataLoader
 from monai.metrics import ROCAUCMetric

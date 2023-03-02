@@ -1,7 +1,7 @@
 import pandas as pd
 import os, sys, torch
 from glob import glob
-
+import nibabel as nib
 
 def load_adni(root_dir, csv):
     # Notes: root_dir should be CAPS_preprocessed; csv is the main csv with the ADNI dataset
@@ -107,3 +107,33 @@ def load_qmin(root_dir, csv):
     image_class = image_class.type(torch.LongTensor)
 
     return image_files_list, image_class, cn
+
+def get_images_from_dirs(data_dir):
+    # basically from here: https://github.com/Project-MONAI/tutorials/blob/main/2d_classification/mednist_tutorial.ipynb
+    class_names = sorted(x for x in os.listdir(data_dir) if os.path.isdir(os.path.join(data_dir, x)))
+    num_classes = len(class_names)
+    image_files = [
+        [os.path.join(data_dir, class_names[i], x) for x in os.listdir(os.path.join(data_dir, class_names[i]))]
+        for i in range(num_classes)
+    ]
+    num_each = [len(image_files[i]) for i in range(num_classes)]
+    image_files_list = []
+    image_classes = []
+    for i in range(num_classes):
+        image_files_list.extend(image_files[i])
+        image_classes.extend([i] * num_each[i])
+    num_total = len(image_classes)
+    # check the dims of the first nifti (assuming they are all the same)
+    image = nib.load(image_files_list[0])
+    data = image.get_fdata()
+    shape = data.shape
+    spacing = image.header.get_zooms()
+
+    print(f"Total image count: {num_total}")
+    print("Based on the first image: ")
+    print(f"Image dimensions: {shape}'")
+    print(f'Image spacing: {spacing}')
+    print(f"Label names: {class_names}")
+    print(f"Label counts: {num_each}")
+
+    return image_files_list, image_classes, class_names, num_classes
