@@ -55,7 +55,7 @@ length = len(image_files_list)
 num_class = 3
 indices = np.arange(length)
 np.random.shuffle(indices)
-bs = 3  # batch size
+bs = 10  # batch size
 max_epochs = 300  # AUC 0.7741 after 100 epochs
 
 test_split = int(test_frac * length)
@@ -116,7 +116,7 @@ device = torch.device("cuda:1" if torch.cuda.is_available() else "cpu")
 # model = DenseNet121(spatial_dims=3, in_channels=1,
 #                     out_channels=num_class).to(device)
 # model = ResidualAttentionNetwork(in_channels=12, num_classes=num_class).to(device)
-model = EfficientNetBN(model_name="efficientnet-b8",pretrained=False,spatial_dims=3,in_channels=1,num_classes=3).to(device)
+model = EfficientNetBN(model_name="efficientnet-b0",pretrained=False,spatial_dims=3,in_channels=1,num_classes=3).to(device)
 loss_function = torch.nn.CrossEntropyLoss()
 optimizer = torch.optim.Adam(model.parameters(), 1e-5)
 val_interval = 1
