@@ -30,7 +30,7 @@ from monai.transforms import (
     ScaleIntensity,
 )
 from monai.utils import set_determinism
-from qmin_dataset import QMINDataset
+from mri_dataset import MRIDataset_bl
 from glob import glob
 import pandas as pd
 from collections import Counter
@@ -100,15 +100,15 @@ y_trans = Compose([AsDiscrete(to_onehot=num_class)])
 
 
 ## Define dataset and dataloader
-train_ds = QMINDataset(train_x, train_y, train_transforms)
+train_ds = MRIDataset_bl(train_x, train_y, train_transforms)
 train_loader = DataLoader(
     train_ds, batch_size=bs, shuffle=True, num_workers=10)
 
-val_ds = QMINDataset(val_x, val_y, val_transforms)
+val_ds = MRIDataset_bl(val_x, val_y, val_transforms)
 val_loader = DataLoader(
     val_ds, batch_size=bs, num_workers=10)
 
-test_ds = QMINDataset(test_x, test_y, val_transforms)
+test_ds = MRIDataset_bl(test_x, test_y, val_transforms)
 test_loader = DataLoader(
     test_ds, batch_size=bs, num_workers=10)
 

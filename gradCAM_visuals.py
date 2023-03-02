@@ -24,7 +24,7 @@ from monai.transforms import (
     ScaleIntensity,
 )
 from monai.utils import set_determinism
-from adni_dataset import ADNIDataset_bl
+from mri_dataset import MRIDataset_bl
 from glob import glob
 import pandas as pd
 from collections import Counter

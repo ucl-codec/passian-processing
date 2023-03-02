@@ -23,7 +23,7 @@ from monai.transforms import (
     Resize,
     ScaleIntensity,
 )
-from adni_dataset import ADNIDataset_bl
+from mri_dataset import MRIDataset_bl
 from helper_functions import load_adni
 from monai.networks.nets import DenseNet121
 
@@ -71,7 +71,7 @@ test_x = [image_files_list[i] for i in test_indices]
 test_y = [image_class[i] for i in test_indices]
 
 # create a validation data loader
-test_ds = ADNIDataset_bl(image_files=image_files_list[-10:], labels=image_class[-10:], transforms=val_transforms)
+test_ds = MRIDataset_bl(image_files=image_files_list[-10:], labels=image_class[-10:], transforms=val_transforms)
 test_loader = DataLoader(test_ds, batch_size=1, num_workers=2)  # , pin_memory=torch.cuda.is_available()
 itera = iter(test_loader)
 
