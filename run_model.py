@@ -32,14 +32,13 @@ from datetime import datetime
 from helper_functions import load_adni
 from helper_functions import get_images_from_dirs
 
-root_dir = '/home/imber/Projects/PASSIAN/data/ADNI/aramis_preproc/CAPS_ADNI_bl_classdirs'  # the full adni baseline dataset
+root_dir = '/home/imber/Projects/PASSIAN/data/ADNI/aramis_preproc/CAPS_ADNI_bl'  # the full adni baseline dataset
+labels_csv_path = glob(root_dir + '/*.csv')[0]
 print("Dataset directory is: ", root_dir)
 ## Set deterministic
 set_determinism(seed=317)
 
-# image_files_list = sorted(glob(os.path.join(root_dir, '*/*Crop*.nii.gz')))
-image_files_list, image_class, class_names, num_classes = get_images_from_dirs(root_dir)
-subjects = [file.split('/')[-1][:12] for file in image_files_list]  # subject ID is the first 13 characters of the file
+image_files_list, image_class, cn = load_adni(root_dir, labels_csv_path)
 
 # Todo: abstract these for tidyness
 

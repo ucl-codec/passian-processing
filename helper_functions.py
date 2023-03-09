@@ -109,6 +109,7 @@ def load_qmin(root_dir, csv):
     return image_files_list, image_class, cn
 
 def get_images_from_dirs(data_dir):
+    # This is in the case we are using PyTorch class folder <-> each class in its folder
     # basically from here: https://github.com/Project-MONAI/tutorials/blob/main/2d_classification/mednist_tutorial.ipynb
     class_names = sorted(x for x in os.listdir(data_dir) if os.path.isdir(os.path.join(data_dir, x)))
     num_classes = len(class_names)
