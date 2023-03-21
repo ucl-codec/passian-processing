@@ -130,3 +130,7 @@ dmypy.json
 
 # Idea
 .idea/
+
+# Local to do's
+.to-do.txt
+
