@@ -3,43 +3,53 @@ import os, sys, torch
 from glob import glob
 import nibabel as nib
 
-def load_adni(root_dir, csv):
+def make_bl_labels_adni(root_dir, csv_file):
+    print("-----Preparing labels csv for baseline ADNI-----")
     # Notes: root_dir should be CAPS_preprocessed; csv is the main csv with the ADNI dataset
     image_files_list = sorted(glob(os.path.join(root_dir, 'subjects/*/ses-bl/t1_linear/*Crop*.nii.gz')))
-    subjects = [file.split('/')[10] for file in image_files_list]
+    subjects = [file.split('/')[-4] for file in image_files_list]
 
     # Filtering and sorting the labels from the clinical data csv
-    labels_df = pd.read_csv(csv, low_memory=False)[['PTID', 'DX', 'VISCODE']]  # only ids, dx, visit
+    labels_df = pd.read_csv(csv_file, low_memory=False)[['PTID', 'DX', 'VISCODE']]  # only ids, dx, visit
     labels_df['FID'] = 'sub-' + labels_df['PTID'].str.replace('_', '')  # add a new file ID columns
     labels_df = labels_df[labels_df['VISCODE'] == 'bl']
     labels_df = labels_df[labels_df['FID'].isin(subjects)]  # filter
     labels_df = labels_df.dropna(subset=['DX'])  # get rid of NaNs in the labels
     labels_df = labels_df.sort_values('FID')  # this should work - test on larger sample!
-    print('Class balance on entire dataset (train + validation + test):\n', labels_df['DX'].value_counts())
+    print('Class balance on entire dataset (train + validation + test): \n', labels_df['DX'].value_counts())
     no_labels = [x for x in subjects if
                  x not in labels_df['FID'].values]  # these subjects are missing labels (delete from dataset)
     if no_labels:
         print('The following subjects in the image_files_list are missing labels:\n', no_labels)
-        print('Aborting...')
-        sys.exit()
+        print('You should delete them from the dataset of images...')
+    else:
+        print('All subject image files seem to have labels')
 
+    cleanlabelsave = os.path.join(root_dir, 'labels.csv')
+    print('Saving labels file to ', cleanlabelsave)
+    cleanlabels_df = labels_df[['FID', 'DX']]
+    cleanlabels_df.to_csv(cleanlabelsave, index=False)
+
+
+def load_labels(root_dir):
+    image_files_list = sorted(glob(os.path.join(root_dir, 'subjects/*/ses-bl/t1_linear/*Crop*.nii.gz')))
+    labels_df = pd.read_csv(os.path.join(root_dir, 'labels.csv'))
     cn = ['CN', 'MCI', 'Dementia']  # class names
     cd = {cn[0]: 0.0, cn[1]: 1.0, cn[2]: 2.0}  # class dictionary  # note to self: always start at 0
     labels_df = labels_df.replace({'DX': cd})
     image_class = torch.tensor(list(labels_df['DX']))
     image_class = image_class.type(torch.LongTensor)
-
     return image_files_list, image_class, cn
 
-def load_qmin(root_dir, csv):
+def make_bl_labels_qmin(root_dir, csv_file):
+    print("-----Preparing labels csv for baseline QMIN-MC-----")
     # Notes: root_dir should be CAPS_preprocessed; csv is the main csv with the QMIN dataset
     image_files_list = sorted(glob(os.path.join(root_dir, 'subjects/sub*/ses*/t1_linear/*Crop*.nii.gz')))
-    subjects = [file.split('/')[8] for file in image_files_list] # for QMIN
+    subjects = [file.split('/')[-4] for file in image_files_list]
 
     # Filtering and sorting the labels from the clinical data csv
-    labels_csv = "/home/mm2075/rds/hpc-work/PASSIAN/QMINCaps/qmin_participants.csv"
-    labels_df = pd.read_csv(labels_csv, low_memory=False)[['FID','DX','sex','age_bl']]   # adjusted the names as in ADNI's file
-# Define the new class names and the corresponding dictionary
+    labels_df = pd.read_csv(csv_file, low_memory=False)[['FID','DX','sex','age_bl']]   # adjusted the names as in ADNI's file
+    # Define the new class names and the corresponding dictionary
     new_class_names = {'Vascular dementia': 'Dementia',
                    'Mixed dementia (Alzheimer\'s disease and vascular dementia)': 'Dementia',
                    'Alzheimer\'s disease': 'Dementia',
@@ -78,35 +88,26 @@ def load_qmin(root_dir, csv):
     # Replace the old labels with new ones
     diagnosis_dict = {'DX': new_class_names}
     labels_df = labels_df.replace(diagnosis_dict)
-    print(labels_df['DX'].value_counts())
 
     # Remove rows with diagnosis values currently not in use
     valid_diagnoses = ['CN', 'MCI', 'Dementia']
     mask = labels_df['DX'].isin(valid_diagnoses)
     labels_df = labels_df[mask]
-    # reset the index for the new df
-    labels_df = labels_df.reset_index(drop=True)
+    labels_df = labels_df.reset_index(drop=True)   # reset the index for the new df
 
     print('Class balance on entire dataset (train, validation, test):\n', labels_df['DX'].value_counts())
     no_labels = [x for x in subjects if
                  x not in labels_df['FID'].values]  # these subjects are missing labels (delete from dataset)
     if no_labels:
         print('The following subjects in the image_files_list are missing labels:\n', no_labels)
-        print('Aborting...')
-        sys.exit()
+        print('You should delete them from the dataset of images...')
+    else:
+        print('All subject image files seem to have labels')
 
-    # Convert the new labels to numerical values
-    cn = ['CN','MCI', 'Dementia']  # class names
-    cd = {cn[0]: 0.0, cn[1]: 1.0, cn[2]: 2.0}  # class dictionary
-    labels_df = labels_df.replace({'DX': cd})
-    print('Final labels used:\n',
-    labels_df['DX'].value_counts())
-
-    # Convert the labels to a PyTorch tensor
-    image_class = torch.tensor(list(labels_df['DX']))
-    image_class = image_class.type(torch.LongTensor)
-
-    return image_files_list, image_class, cn
+    cleanlabelsave = os.path.join(root_dir, 'labels.csv')
+    print('Saving labels file to ', cleanlabelsave)
+    cleanlabels_df = labels_df[['FID', 'DX']]
+    cleanlabels_df.to_csv(cleanlabelsave, index=False)
 
 def get_images_from_dirs(data_dir):
     # This is in the case we are using PyTorch class folder <-> each class in its folder
@@ -138,3 +139,14 @@ def get_images_from_dirs(data_dir):
     print(f"Label counts: {num_each}")
 
     return image_files_list, image_classes, class_names, num_classes
+
+## Just testing, to be deleted
+roodir = '/home/imber/Projects/PASSIAN/data/ADNI/aramis_preproc/B_node_caps_adni_bl'
+csv = '/home/imber/Projects/PASSIAN/data/ADNI/aramis_preproc/B_node_caps_adni_bl/ADNIMERGE_2022-09-02.csv'
+
+make_bl_labels_adni(roodir, csv)
+image_files_list, image_class, cn = load_labels(roodir)
+
+roodir = '/home/imber/Projects/PASSIAN/data/ADNI/aramis_preproc/A_node_caps_adni_bl'
+csv = '/home/imber/Projects/PASSIAN/data/qmin_participants.csv'
+make_bl_labels_qmin(roodir, csv)

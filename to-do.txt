@@ -1,0 +1,12 @@
+## Preprocessing
+1. Monai-based preprocessing pipeline for the images
+    1. Nifti and BIDS conversion
+    2. Bias field correction
+    3. Crop
+2. Labels processing:
+   1. Reformat CSV to map and extract labels (make cleaner) rather than use full csv...
+
+3. Coronal-view training
+   1. Rotation and select/crop of a
+
+4. Test the deployment and make sure it works
