@@ -141,12 +141,12 @@ def get_images_from_dirs(data_dir):
     return image_files_list, image_classes, class_names, num_classes
 
 ## Just testing, to be deleted
-roodir = '/home/imber/Projects/PASSIAN/data/ADNI/aramis_preproc/B_node_caps_adni_bl'
-csv = '/home/imber/Projects/PASSIAN/data/ADNI/aramis_preproc/B_node_caps_adni_bl/ADNIMERGE_2022-09-02.csv'
+roodir = '/home/imber/Projects/PASSIAN/data/ADNI/aramis_preproc/A_node_caps_adni_bl'
+csv = '/home/imber/Projects/PASSIAN/data/ADNI/aramis_preproc/A_node_caps_adni_bl/ADNIMERGE_2022-09-02.csv'
 
 make_bl_labels_adni(roodir, csv)
 image_files_list, image_class, cn = load_labels(roodir)
 
-roodir = '/home/imber/Projects/PASSIAN/data/ADNI/aramis_preproc/A_node_caps_adni_bl'
-csv = '/home/imber/Projects/PASSIAN/data/qmin_participants.csv'
-make_bl_labels_qmin(roodir, csv)
+# roodir = '/home/imber/Projects/PASSIAN/data/ADNI/aramis_preproc/A_node_caps_adni_bl'
+# csv = '/home/imber/Projects/PASSIAN/data/qmin_participants.csv'
+# make_bl_labels_qmin(roodir, csv)
